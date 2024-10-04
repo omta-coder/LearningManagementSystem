@@ -1,7 +1,8 @@
 import axiosInstance from "@/api/axiosInstance";
+import { Skeleton } from "@/components/ui/skeleton";
 import { initialSignInFormData, initialSignUpFormData } from "@/config";
-import { loginService, registerService } from "@/services";
-import { createContext, useState } from "react";
+import { checkAuthService, loginService, registerService } from "@/services";
+import { createContext, useEffect, useState } from "react";
 
 export const AuthContext = createContext(null);
 
@@ -23,8 +24,8 @@ export default function AuthProvider({ children }) {
     const data = await loginService(signInFormData);
 
     if (data.success) {
-      console.log(data,"data");
-      
+      console.log(data, "data");
+
       sessionStorage.setItem(
         "accessToken",
         JSON.stringify(data.data.accessToken)
@@ -41,6 +42,48 @@ export default function AuthProvider({ children }) {
     }
   };
 
+  //check auth user
+
+  const checkAuthUser = async () => {
+    try {
+      const data = await checkAuthService();
+      if (data.success) {
+        setAuth({
+          authenticate: true,
+          user: data.data.user,
+        });
+        setLoading(false);
+      } else {
+        setAuth({
+          authenticate: false,
+          user: null,
+        });
+        setLoading(false);
+      }
+    } catch (error) {
+      console.log(error);
+      if (!error?.response?.data?.success) {
+        setAuth({
+          authenticate: false,
+          user: null,
+        });
+        setLoading(false);
+      }
+    }
+  };
+
+  const resetCredentials = () => {
+    setAuth({
+      authenticate: false,
+      user: null,
+    });
+  };
+
+  useEffect(() => {
+    checkAuthUser();
+  }, []);
+  console.log(auth);
+
   return (
     <AuthContext.Provider
       value={{
@@ -50,9 +93,11 @@ export default function AuthProvider({ children }) {
         setSignUpFormData,
         handleRegisterUser,
         handleLoginUser,
+        auth,
+        resetCredentials
       }}
     >
-      {children}
+      {loading ? <Skeleton /> : children}
     </AuthContext.Provider>
   );
 }
