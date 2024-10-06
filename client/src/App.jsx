@@ -7,6 +7,7 @@ import InstructorDashboardpage from "./pages/instructor/dashboard";
 import StudentViewCommonLayout from "./components/student-view/common-layout";
 import NotFoundPage from "./pages/not-found";
 import StudentHomePage from "./pages/student/home";
+import AddNewCoursePage from "./pages/instructor/add-new-course";
 
 const App = () => {
   const { auth } = useContext(AuthContext);
@@ -27,6 +28,16 @@ const App = () => {
         element={
           <RouteGuard
             element={<InstructorDashboardpage />}
+            authenticated={auth?.authenticate}
+            user={auth?.user}
+          />
+        }
+      />
+      <Route
+        path="/instructor/create-new-course"
+        element={
+          <RouteGuard
+            element={<AddNewCoursePage />}
             authenticated={auth?.authenticate}
             user={auth?.user}
           />
