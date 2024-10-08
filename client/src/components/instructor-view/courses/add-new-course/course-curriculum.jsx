@@ -40,7 +40,7 @@ const CourseCurriculum = () => {
     let cpyCourseCurriculumFormData = [...courseCurriculumFormData];
     cpyCourseCurriculumFormData[currentIndex] = {
       ...cpyCourseCurriculumFormData[currentIndex],
-      freePreview: currentValue,
+      freePreview: currentValue
     };
 
     setCourseCurriculumFormData(cpyCourseCurriculumFormData);
