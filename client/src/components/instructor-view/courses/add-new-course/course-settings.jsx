@@ -1,3 +1,4 @@
+import MediaProgressbar from "@/components/media-progress-bar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,6 +12,8 @@ const CourseSettings = () => {
     setCourseLandingFormData,
     mediaUploadProgress,
     setMediaUploadProgress,
+    mediaUploadProgressPercentage,
+    setMediaUploadProgressPercentage,
   } = useContext(InstructorContext);
 
   const handleImageUploadChange = async (event) => {
@@ -19,10 +22,15 @@ const CourseSettings = () => {
     if (selectedImage) {
       const imageFormData = new FormData();
       imageFormData.append("file", selectedImage);
-      try {
-        const response = await mediaUploadService(imageFormData);
-        console.log(response, "response");
 
+      try {
+        setMediaUploadProgress(true);
+        const response = await mediaUploadService(
+          imageFormData,
+          setMediaUploadProgressPercentage
+        );
+        console.log(response);
+        
         if (response.success) {
           setCourseLandingFormData({
             ...courseLandingFormData,
@@ -30,33 +38,40 @@ const CourseSettings = () => {
           });
           setMediaUploadProgress(false);
         }
-      } catch (error) {
-        console.log(error);
+      } catch (e) {
+        console.log(e);
       }
     }
   };
-  console.log(courseLandingFormData, "courseLandingFormData");
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Course Settings</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {courseLandingFormData?.image ? (
-          <img src={courseLandingFormData.image} />
-        ) : (
-          <div className="flex flex-col gap-3">
-            <Label>Upload Course Image</Label>
-            <Input
-              onChange={handleImageUploadChange}
-              type="file"
-              accept="image/*"
-            />
-          </div>
-        )}
-      </CardContent>
-    </Card>
+    <CardHeader>
+      <CardTitle>Course Settings</CardTitle>
+    </CardHeader>
+    <div className="p-4">
+      {mediaUploadProgress ? (
+        <MediaProgressbar
+          isMediaUploading={mediaUploadProgress}
+          progress={mediaUploadProgressPercentage}
+        />
+      ) : null}
+    </div>
+    <CardContent>
+      {courseLandingFormData?.image ? (
+        <img src={courseLandingFormData.image} />
+      ) : (
+        <div className="flex flex-col gap-3">
+          <Label>Upload Course Image</Label>
+          <Input
+            onChange={handleImageUploadChange}
+            type="file"
+            accept="image/*"
+          />
+        </div>
+      )}
+    </CardContent>
+  </Card>
   );
 };
 
